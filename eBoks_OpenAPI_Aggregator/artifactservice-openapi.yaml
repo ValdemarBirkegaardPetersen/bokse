@@ -1,0 +1,1559 @@
+openapi: 3.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/e-Boks/ArtifactService/2.0.0
+info:
+  version: "2.10.0"
+  title: Artifact service
+  description: >-
+    The Artifact service is responsible for managing artifact components through a HTTP REST interface.
+tags:
+  - name: artifacts
+  - name: blobs
+  - name: organization-storage-configurations
+security: 
+  - BearerAuth: []
+paths:
+  /artifacts:
+    get:
+      summary: Get Artifacts.
+      parameters:
+        - name: mailboxId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: Int64
+            example: 1
+          description: Mailbox Identifier.
+        - in: query
+          name: messageId
+          required: false
+          schema:
+            type: integer
+            format: Int64
+            example: 1
+          description:  Message Identifier.
+        - name: $fields
+          in: query
+          required: false
+          schema:
+            type: string
+            example: id
+          description: List of specific properties to select.
+        - name: $expands
+          in: query
+          required: false
+          schema:
+            type: string
+            example: recipients
+          description: Property to expand.
+      description: Get all Artifacts related to the specific message.
+      tags:
+        - artifacts
+      responses:
+        '200':
+          description: >-
+            Artifact items collection.
+          content:
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/artifacts'
+        '400':
+          description: >-
+            Bad Request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      summary: Create Artifact
+      description: Create the Artifact
+      requestBody:
+        $ref: '#/components/requestBodies/artifactBody'
+      tags:
+      - artifacts
+      responses:
+        '200':
+          description: >-
+            Artifact was stored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14005</td>
+                <td>The File Name contains forbidden file extension.</td>
+              </tr>
+              <tr>
+                <td>14051</td>
+                <td>The Mailbox ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14052</td>
+                <td>The Message ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14053</td>
+                <td>The Blob ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14100</td>
+                <td>The File Name couldn't be empty.</td>
+              </tr>
+              <tr>
+                <td>14101</td>
+                <td>The File Name has invalid length.</td>
+              </tr>
+              <tr>
+                <td>14102</td>
+                <td>Invalid Artifact Type.</td>
+              </tr>
+              <tr>
+                <td>14103</td>
+                <td>The MimeType couldn't be empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /artifacts/{id}:
+    get:
+      summary: Get Artifact by the specific ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the artifact.
+      - name: $expands
+        in: query
+        required: false
+        schema:
+          type: string
+          example: blob
+        description: Property to expand.
+      description: |
+        # Get the Artifact item metadata from the server.
+        
+        **Response could be expanded with the models:**
+
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Parameter name</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tr>
+            <td>Artifact BLOB</td>
+            <td>blob</td>
+            <td>?$expands=blob</td>
+          </tr>
+        </table>
+      tags:
+      - artifacts
+      responses:
+        '200':
+          description: >-
+            Artifact item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/artifactItem'
+        '400':
+          description:  >-
+            Bad Request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not Found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      summary: Delete the Artifact by the specific ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the artifact.
+      description: |
+        # Delete the Artifact.
+      tags:
+      - artifacts
+      responses:
+        '204':
+          description: >-
+            Artifact was deleted successfully.
+        '400':
+          description:  >-
+            Bad Request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not Found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /artifacts/{id}/download:
+    get:
+      summary: Download Artifact's document
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the artifact.
+      description: |
+        # Download the Artifact's document.
+      tags:
+      - artifacts
+      responses:
+        '200':
+          description: >-
+            Artifact's related document.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description:  >-
+            Bad Request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14030</td>
+                <td>Couldn't find blob by specified Artifact ID.</td>
+              </tr>
+            </table>
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /artifacts/download-token:
+    get:
+      summary: Get token for download-with-token methods
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: >-
+          The collection of the Artifacts IDs separated by comma.
+        example: "1,2,48"
+      description: |
+        # Get token for download-with-token method.
+      tags:
+      - artifacts
+      responses:
+        '200':
+          description: >-
+            Token is granted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '400':
+          description: >-
+            Bad request.
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14200</td>
+                <td>Id parameter couldn't be empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14020</td>
+                <td>The Artifact was not found.</td>
+              </tr>
+            </table>
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+                
+  /artifacts/batch:
+    post:
+      summary: Create Artifacts
+      description: Create Artifacts
+      tags:
+      - artifacts
+      requestBody:
+        description: >-
+          Array of artifacts.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                    $ref: '#/components/schemas/artifactRequestItem'
+      responses:
+        '200':
+          description: >-
+            Artifacts were stored.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of uploaded artifacts.
+                items:
+                  $ref: '#/components/schemas/IdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14005</td>
+                <td>The File Name contains forbidden file extension.</td>
+              </tr>
+              <tr>
+                <td>14051</td>
+                <td>The Mailbox ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14052</td>
+                <td>The Message ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14053</td>
+                <td>The Blob ID is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14100</td>
+                <td>The File Name couldn't be empty.</td>
+              </tr>
+              <tr>
+                <td>14101</td>
+                <td>The File Name has invalid length.</td>
+              </tr>
+              <tr>
+                <td>14102</td>
+                <td>Invalid Artifact Type.</td>
+              </tr>
+              <tr>
+                <td>14103</td>
+                <td>The MimeType couldn't be empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      
+  /artifacts/{id}/download-with-token:
+    get:
+      summary: Download artifact's document with token
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the artifact.
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+          format: string
+          example: 'e2FydGlmYWN0SWQ6IDEsIGlwOiBJUCBvZiBjYWxsZXIsIHJlZmVyZW5jZVRva2VuOiBPQXV0aFJlZmVyZW5jZVRva2VufQ=='
+        description: Token in base64.
+      description: |
+        # Download the Artifact's document with token.
+      tags:
+      - artifacts
+      security: []
+      responses:
+        '200':
+          description: >-
+            Artifact's related document.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14020</td>
+                <td>The Artifact was not found.</td>
+              </tr>
+            </table>
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /artifacts/download-with-token:
+    get:
+      summary: Download artifacts documents with token as ZIP archive
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: >-
+          The collection of the Artifacts IDs separated by comma.
+        example: "1,2,48"
+      - name: token
+        in: query
+        required: true
+        schema:
+          type: string
+          format: string
+          example: 'e2FydGlmYWN0SWQ6IDEsIGlwOiBJUCBvZiBjYWxsZXIsIHJlZmVyZW5jZVRva2VuOiBPQXV0aFJlZmVyZW5jZVRva2VufQ=='
+        description: Token in base64.
+      description: |
+        # Download messages artifacts as ZIP archive.
+      tags:
+      - artifacts
+      security: []
+      responses:
+        '200':
+          description: >-
+            Messages artifacts as ZIP archive.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description:  >-
+            Bad Request.
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14200</td>
+                <td>Id parameter is empty.</td>
+              </tr>
+              <tr>
+                <td>14201</td>
+                <td>Token parameter is empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14020</td>
+                <td>The Artifact was not found.</td>
+              </tr>
+            </table>
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs:
+    get:
+      summary: Get list of BLOB metadata
+      tags:
+      - blobs
+      description: >-
+        Get list of BLOB metadata by query.
+      parameters:  
+      - name: $fields
+        in: query
+        required: false
+        schema: 
+          type: string 
+          example: id
+        description: >-
+          List of specific properties to select.
+      - name: $expands
+        in: query
+        required: false
+        schema:
+          type: string
+          example: features
+        description: >-
+          The property to expand.
+      responses:
+        '200':
+          description: >-
+            List of BLOB metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/blobMetadata'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14014</td>
+                <td>The Request content is empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      summary: Create BLOB
+      description: Store BLOB data to the cloud storage.
+      parameters:
+      - name: batchTransactionExternalId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: >-
+          Batch transaction external identifier.
+        example: "some-id"
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      tags:
+      - blobs
+      responses:
+        '201':
+          description: >-
+            BLOB was stored successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14014</td>
+                <td>The Request content is empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs/{blobId}:
+    get:
+      summary: Get BLOB
+      parameters:
+      - name: blobId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+        description: >-
+          Id of the BLOB.
+      description: >-
+        Get the BLOB by specific ID.
+      tags:
+      - blobs
+      responses:
+        '200':
+          description: >-
+            Status of the message.
+          content:
+            application/octet-stream:
+              schema:
+                type: string 
+                example: example
+                format: binary
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14053</td>
+                <td>The Blob ID is zero or less.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14030</td>
+                <td>Couldn't find Blob by specified ID</td>
+              </tr>
+            </table>
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs/persisted:
+    put:
+      summary: Create persisted BLOB
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      description: >-
+        Store persisted BLOB data to the cloud storage.
+      parameters:
+      - name: organizationId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+        description: >-
+          Organization id.
+        example: 1
+      - name: batchTransactionExternalId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: >-
+          Batch transaction external identifier.
+        example: "some-id"
+      tags:
+      - blobs
+      responses:
+        '201':
+          description: >-
+            BLOB was stored successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14014</td>
+                <td>The Request content is empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs/batch:
+    post:
+      summary: BatchBlobsUpload
+      description: Upload blobs batch
+      tags:
+      - blobs
+      parameters:
+      - name: batchTransactionExternalId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: >-
+          Batch transaction external identifier.
+        example: "some-id"
+      requestBody:
+        description: >-
+          A multipart/form-data containing files.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                anyNames: # any name of form-data
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: >-
+            Blobs were stored successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: List of uploaded blobs.
+                items:
+                  $ref: '#/components/schemas/uploadedBlob'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    get:
+      summary: Get batch of temporary blobs.
+      description: Get batch of temporary blobs
+      tags: 
+        - blobs
+      parameters: 
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: >-
+          The id collection of the blob ids separated by comma.
+        example: "1337,1987"
+      responses:
+        '200':
+          description: OK
+          content:
+            multipart/form-data:
+              schema:
+                type: string 
+                example: | 
+                    -----------------------------9051914041544843365972754266 
+                    Content-Disposition: form-data; name="1337"
+
+                    Blob content 1
+                    -----------------------------9051914041544843365972754266
+                    Content-Disposition: form-data; name="1987"
+                    Content-Type: text/plain
+
+                    Blob content 2
+                    -----------------------------9051914041544843365972754266--
+                format: binary
+        '400':
+          description: |
+            Bad request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs/copy:
+    post:
+      summary: Copy non persisted blobs.
+      description: >-
+        Copy non persisted blobs.
+      tags:
+      - blobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Blobs to copy.
+              items:
+                description: Blob identifier.
+                type: number
+                format: int64
+                example: 2
+            example:
+              [2, 3]
+      responses:
+        '200':
+          description: >-
+            Non persisted blobs were copied successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Copied blobs.
+                items:
+                  description: Blob identifier.
+                  type: number
+                  format: int64
+                  example: 4
+              example:
+                [4, 5]
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14230</td>
+                <td>Blob should be non persisted for copy.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /blobs/list-files:
+    get:
+      summary: List stored files.
+      description: Export list of files persisted on organization's storage
+      tags:
+      - blobs
+      parameters: 
+      - name: organizationId
+        in: query
+        required: true
+        schema:
+          type: string
+        description: >-
+          The organization Id.
+        example: "1"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: CSV with files list.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14110</td>
+                <td>The organization identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14220</td>
+                <td>List Files operation already executing.</td>
+              </tr>
+            </table>
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /organization-storage-configurations:
+    get:
+      summary: Gets organization storage configuration.
+      description: Gets organization storage configuration.
+      tags: 
+        - organization-storage-configurations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of organization storage configurations. Because organization id is unique should contain 1 element.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/organizationStorageConfiguration'
+                  itemCount:
+                    type: integer
+                    example: 1
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    put:
+      summary: Create or update organization storage configuration.
+      description: >-
+        Create or update organization storage configuration.
+      tags:
+      - organization-storage-configurations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/organizationStorageConfigurationEditable'
+              required:
+              - organizationId
+              - endpointUrl
+              - bucketName
+              - key
+              - secret
+              - publicKey
+            example: 
+              organizationId: 1
+              endpointUrl: https://s3.eu-north-1.amazonaws.com
+              bucketName: artifacts-bucket
+              key: A823ADKF2
+              secret: FAF2AF22GKAK57
+              publicKey: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De
+      responses:
+        '200':
+          description: >-
+            The organization storage configuration was created or updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdResponse'
+        '400': 
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>14110</td>
+                <td>The organization identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>14111</td>
+                <td>The organization endpoint URL is empty.</td>
+              </tr>
+              <tr>
+                <td>14112</td>
+                <td>The organization bucket name is empty.</td>
+              </tr>
+              <tr>
+                <td>14113</td>
+                <td>The organization access key is empty.</td>
+              </tr>
+              <tr>
+                <td>14114</td>
+                <td>The organization secret key is empty.</td>
+              </tr>
+              <tr>
+                <td>14115</td>
+                <td>The organization public key is empty.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organization-storage-configurations/{id}:
+    delete:
+      summary: Delete the organization storage configuration.
+      description: >-
+        Delete the organization storage configuration.
+      tags:
+      - organization-storage-configurations
+      parameters: 
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+        description: >-
+          The id of the organization storage configuration.
+      responses:
+        '204':
+          description: >-
+            The organization storage configuration was deleted successfully.
+        '400':
+          description:  >-
+            Bad Request.
+        '401':
+          description: >-
+            Unauthorized.
+        '403':
+          description: >-
+            Forbidden.
+        '404':
+          description: >-
+            Not Found.
+        '500':
+          description: >-
+            Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  requestBodies:
+    artifactBody:
+      description: JSON request body to store Artifact.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/artifactRequestItem'
+  schemas:
+    artifactItem:
+      allOf:
+        - $ref: '#/components/schemas/artifactRequestItem'
+      type: object
+      description: Artifact item.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Artifact identifier.
+          example: 1
+    artifactRequestItem:
+      type: object
+      required:
+        - mailboxId
+        - messageId
+        - organizationId
+        - artifactIndex
+        - blobId
+        - fileName
+        - mimeType
+        - type
+      properties:
+        mailboxId:
+          type: integer
+          format: int64
+          description: Mailbox Identifier.
+          example: 1
+        messageId:
+          type: integer
+          format: int64
+          description: Message Identifier.
+          example: 1
+        organizationId:
+          type: integer
+          format: int64
+          description: Organization Identifier.
+          example: 1
+        artifactIndex:
+          type: integer
+          description: Artifact specific Index.
+          example: 1
+        blobId:
+          type: integer
+          format: int64
+          description: Id of Blob that is the content of the Artifact.
+          example: 1
+        fileName:
+          type: string
+          description: File name of Artifact.
+          example: Artifact1
+        mimeType:
+          type: string
+          description: Mime-type of related blob.
+          example: application/pdf
+        type:
+          type: string
+          enum:
+            - MessageDocument
+            - MessageBodyDocument
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>MessageDocument</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>MessageBodyDocument </td>
+                <td>2</td>
+              </tr>
+            </table>
+          example: MessageDocument
+        dateCreated:
+          type: string
+          format: date-time
+          description: Date the Artifact was created.
+          example: "2018-12-15T13:14:22.4091760Z"
+        hash:
+          type: string
+          format: binary
+          description: Binary hash of file.
+        hashAlgorithm:
+          type: string
+          description: Hashing algorithm used to calculate the hash.
+          example: SHA256
+        signature:
+          type: string
+          format: binary
+          description: Binary signature of file.
+        signatureAlgorithm:
+          type: string
+          description: Algorithm used for signing.
+          example: RSA+SHA256
+        signatureCertificateId:
+          type: integer
+          format: int64
+          description: Id of Certificate used to verify the signature.
+          example: 1
+        title:
+          type: string
+          description: Title of Artifact.
+          example: The new Artifact
+    artifacts:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/artifactItem'
+        itemCount:
+          type: integer
+          description: Number of items in result.
+          example: 1
+    organizationStorageConfigurationEditable:
+      type: object
+      required:
+      - organizationId
+      - endpointUrl
+      - bucketName
+      - key
+      - secret
+      - publicKey
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+          description: Id of organization.
+          example: 1
+        endpointUrl:
+          type: string
+          description: Endpoint url.
+          example: https://s3.eu-north-1.amazonaws.com       
+        bucketName:
+          type: string
+          description: Bucket name.
+          example: artifacts-bucket 
+        key:
+          type: string
+          description: Access key.
+          example: A823ADKF2
+        secret:
+          type: string
+          description: Secret key.
+          example: FAF2AF22GKAK57
+        publicKey:
+          type: string
+          format: byte
+          description: Public key of an organization.
+          example: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqGKukO1De
+    organizationStorageConfiguration:
+      allOf:
+        - $ref: '#/components/schemas/organizationStorageConfigurationEditable'
+      type: object
+      description: Artifact item.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Artifact identifier.
+          example: 1 
+    blobModelEditable:
+      type: object
+      required:
+        - storageUri
+        - size
+        - originalSize
+        - encryptionKeyId
+      properties:
+        storageUri:
+            type: string
+            description: Storage URI of blob.
+            example: amazon://ext-storage/_cea0f2d1-d7b4-4f2a-81c9-1755b175e006
+        ownerUserId:
+          type: integer
+          format: int64
+          description: Id of owning user.
+          example: 1
+        size:
+          type: integer
+          format: int64
+          description: Encrypted size of blob.
+          example: 54848
+        originalSize:
+          type: integer
+          format: int64
+          description: Original size of blob.
+          example: 54848
+        encryptionKeyId:
+          type: integer
+          format: int64
+          description: Id of encryption key.
+          example: 1
+    blobMetadata:
+      allOf:
+        - $ref: '#/components/schemas/blobModelEditable'
+        - type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of blob.
+          example: 1
+        status:
+          type: string
+          enum: [NonPersisted, Persisting, Persisted]
+          description: Status of the blob.
+          example: Persisted
+        originalHash:
+          type: string
+          description: Original blob hash
+          example: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069
+        encryptedHash:
+          type: string
+          description: Encrypted blob hash
+          example: ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d90697f83b1657
+        hashAlgorithm:
+          type: string
+          enum: 
+            - Sha256
+          description: Hash algorythm
+        batchTransactionExternalId:
+          type: string
+          description: Batch transaction external identifier.
+          example: some-id
+    IdResponse:
+     type: object
+     properties:
+        Id:
+          type: integer
+          format: int64
+          description: Created item ID.
+          example: 1
+    validationError:
+      type: object
+      description: Validation error.
+      properties:
+        validationErrorCode:
+          type: integer
+          description: Validation error code.
+          example: 14100
+        propertyName:
+          type: string
+          description: Property name.
+          example: FileName.
+    token:
+      type: object
+      description: Token dto.
+      properties:
+        token:
+          type: string
+          description: Token
+          example: "e2FydGlmYWN0SWQ6IDEsIGlwOiBJUCBvZiBjYWxsZXIsIHJlZmVyZW5jZVRva2VuOiBPQXV0aFJlZmVyZW5jZVRva2VufQ=="
+    uploadedBlob:
+      type: object
+      description: Uploaded blob dto.
+      properties:
+        blobId:
+          type: integer
+          description: Uploaded blob identifier.
+          example: 1
+        name:
+          type: string
+          description: Name of the uploaded part from form-data
+          example: file1
+    error:
+      type: object
+      description: Error details.
+      properties:
+        errorCode:
+          type: integer
+          description: Internal code of an error.
+          example: 10
+        errorMessage:
+          type: string
+          description: Error message.
+          example: Failed operation.
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/validationError'
+        isTemporary:
+          type: boolean
+          description: Indicates whether an error is temporary.
+          example: false
+  responses:
+    internalServerError:
+      description: >-
+        Server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            errorCode: 0
+            errorMessage: "Some internal error message"
+            validationErrors: null
+            isTemporary: false

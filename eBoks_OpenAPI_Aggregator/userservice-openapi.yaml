@@ -1,0 +1,1779 @@
+openapi: 3.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/e-Boks/UserService/1.1.0
+info:
+  version: "2.10.0"
+  title: User Service
+  description: This service is responsible for storing users.
+tags: 
+  - name: users
+  - name: user-status
+  - name: password-credentials
+  - name: certificates
+  - name: statistics
+security: 
+  - BearerAuth: []
+paths:
+  /users:
+    post:
+      tags: 
+        - users
+      summary: Creates new user.
+      description: Creates user with different type of credentials. Now supports password credentials.
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/createUser'
+              required:
+              - organizationId
+              - name
+              - languageId
+              - countryId
+              - userName
+              - activationStatus
+      responses:
+        '200':
+          description: User has been created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/idResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13001</td>
+                <td>The organization identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13002</td>
+                <td>The language identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13003</td>
+                <td>The country identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13004</td>
+                <td>The accepted terms identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13005</td>
+                <td>The accepted terms type is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13050</td>
+                <td>The identity is empty.</td>
+              </tr>
+              <tr>
+                <td>13051</td>
+                <td>The name is empty.</td>
+              </tr>
+              <tr>
+                <td>13053</td>
+                <td>The password is empty.</td>
+              </tr>
+              <tr>
+                <td>13055</td>
+                <td>The email activation link is empty.</td>
+              </tr>
+              <tr>
+                <td>13056</td>
+                <td>The certificate is empty.</td>
+              </tr>
+              <tr>
+                <td>13060</td>
+                <td>User identities list is empty.</td>
+              </tr>
+              <tr>
+                <td>13061</td>
+                <td>No other identities are allowed if identity of UserName type already added.</td>
+              </tr>
+              <tr>
+                <td>13056</td>
+                <td>The certificate is empty.</td>
+              </tr>
+              <tr>
+                <td>13100</td>
+                <td>The identity length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>13150</td>
+                <td>The user type is undefined.</td>
+              </tr>
+              <tr>
+                <td>13101</td>
+                <td>The name length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>13200</td>
+                <td>Password complexity rules are not met.</td>
+              </tr>
+              <tr>
+                <td>13201</td>
+                <td>Email for activation link is not an email.</td>
+              </tr>
+              <tr>
+                <td>13550</td>
+                <td>The certificate cannot be parsed.</td>
+              </tr>
+              <tr>
+                <td>13509</td>
+                <td>User should accept terms and conditions.</td>
+              </tr>
+              <tr>
+                <td>13510</td>
+                <td>User accepted duplicated terms and conditions.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+                
+  /users/{userId}:
+    get:
+      tags: 
+        - users
+      summary: Gets user information.
+      description: Gets user information by user id.
+      parameters: 
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User Id.
+      responses:
+        '200':
+          description: User info has been retreived successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  
+  /users/{userId}/update:
+    post:
+      tags: 
+        - users
+      summary: Updates the user.
+      description: Updates the user properties that are allowed to be modified.
+      parameters: 
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User Id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userModifiableProperties'
+
+      responses:
+        '204':
+          description: The user has been updated successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13002</td>
+                <td>The language identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13003</td>
+                <td>The country identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13051</td>
+                <td>The name is empty.</td>
+              </tr>
+              <tr>
+                <td>13101</td>
+                <td>The name length is incorrect.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  /users/interim:
+    post:
+      tags: 
+        - users
+      summary: Creates new interim user.
+      description: Creates interim user with all blanked data except identity.
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/createInterimUser'
+              required:
+              - userName
+              - identityTypeId
+              - dateOfBirth
+            example:
+              userName: jsmith
+              identityTypeId: 1
+              dateOfBirth: "2000-03-10"
+      responses:
+        '200':
+          description: Interim user has been created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/idResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13050</td>
+                <td>The userName is empty.</td>
+              </tr>
+              <tr>
+                <td>13100</td>
+                <td>The userName length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>13610</td>
+                <td>Date of birth is undefined.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+                
+  /users/interim/activate:
+    post:
+      tags: 
+        - users
+      summary: Activate the interim user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/activateInterimUser'
+              required:
+              - id
+              - name
+              - originalIdentity
+              - originalIdentityTypeId
+              - languageId
+              - countryId
+              - userAcceptedTerms
+            example:
+              id: 1
+              name: UserNameLessThen100
+              originalIdentity: mygovid123
+              originalIdentityTypeId: 2
+              password: Str0ngPassword
+              languageId: 1
+              countryId: 1
+              userAcceptedTerms: [{ termId: 1, termType: 2 }, { termId: 2 , termType: 1 }]
+              
+      responses:
+        '200':
+          description: Interim user has been activated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/idResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13006</td>
+                <td>The user identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13051</td>
+                <td>The name is empty.</td>
+              </tr>
+              <tr>
+                <td>13101</td>
+                <td>The name length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>13002</td>
+                <td>The language identifier is zero or less</td>
+              </tr>
+              <tr>
+                <td>13003</td>
+                <td>The country identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13053</td>
+                <td>The password is empty.</td>
+              </tr>
+              <tr>
+                <td>13200</td>
+                <td>Password complexity rules are not met.</td>
+              </tr>
+              <tr>
+                <td>13509</td>
+                <td>The user should accept terms and conditions.</td>
+              </tr>
+              <tr>
+                <td>13510</td>
+                <td>The user accepted the same terms and conditions twice.</td>
+              </tr>
+              <tr>
+                <td>13620</td>
+                <td>The interim user already activated.</td>
+              </tr>
+            </table>
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13410</td>
+                <td>The user was not found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  /users/interim/deliver-messages:
+    post:
+      tags: 
+        - users
+      summary: Deliver messages for interim user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/deliverInterimMessagesDto'
+              required:
+              - accept
+              
+      responses:
+        '200':
+          description: Interim user has accepted or rejected interim messages.
+        '403':
+          description: Forbidden.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13621</td>
+                <td>The interim user has not been activated yet.</td>
+              </tr>
+            </table>
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13410</td>
+                <td>The user was not found.</td>
+              </tr>
+              <tr>
+                <td>13420</td>
+                <td>The user status was not found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  
+  /users/search:
+    post:
+      summary: Search user.
+      description: >-
+        This method searches users.
+      tags: 
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/searchForUsersDto'
+      responses:
+        '200':
+          description: Users were found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/searchUserResponseDto'
+        '400':
+          description: |
+            Bad request.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+                
+  /user-status/{userId}:
+    get:
+      tags: 
+        - user-status
+      summary: Gets user status information.
+      description: Gets user status information.
+      parameters: 
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User Id.
+      responses:
+        '200':
+          description: User status has been retreived successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userStatus'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+    
+  /user-status/{userId}/update:
+    post:
+      tags: 
+        - user-status
+      summary: Updates the user status.
+      description: Updates the user status.
+      parameters: 
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User Id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userStatusModifiable'
+
+      responses:
+        '204':
+          description: The user has been updated successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13500</td>
+                <td>The deactivation reason cannot be changed.</td>
+              </tr>
+              <tr>
+                <td>13501</td>
+                <td>The deactivation reason must be provided.</td>
+              </tr>
+              <tr>
+                <td>13630</td>
+                <td>The user can not be deactivated with interim reason.</td>
+              </tr>
+              <tr>
+                <td>13640</td>
+                <td>The interim user can not be activated via update status.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  
+  /user-status/{userId}/request-deletion:
+    post:
+      tags: 
+        - user-status
+      summary: Updates the user status.
+      description: Updates the user status.
+      parameters: 
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User Id.
+
+      responses:
+        '204':
+          description: The user has been requested deletion successfully.
+        '400':
+          description: BadRequest.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+
+  /password-credentials/activate-password:
+    post:
+      tags: 
+        - password-credentials
+      summary: Activate an one time password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/activatePasswordDto'
+      responses:
+        '204':
+          description: The one time password was activated and changed.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13502</td>
+                <td>Too many password activation attempts.</td>
+              </tr>
+              <tr>
+                <td>13503</td>
+                <td>Invalid password activation attempt.</td>
+              </tr>
+              <tr>
+                <td>13001</td>
+                <td>Organization id is less than 1.</td>
+              </tr>
+              <tr>
+                <td>13054</td>
+                <td>Activation code is empty.</td>
+              </tr>
+              <tr>
+                <td>13053</td>
+                <td>Password is empty.</td>
+              </tr>
+              <tr>
+                <td>13200</td>
+                <td>Password complexity is wrong.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13400</td>
+                <td>The password could not be found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  /password-credentials/reset-password:
+    post:
+      tags: 
+        - password-credentials
+      summary: Reset the password of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/resetPasswordDto'
+      responses:
+        '204':
+          description: The one time password was activated and changed.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13053</td>
+                <td>The password is empty.</td>
+              </tr>
+              <tr>
+                <td>13200</td>
+                <td>Password complexity rules are not met.</td>
+              </tr>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13400</td>
+                <td>The password could not be found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+
+  /password-credentials/change-password:
+    post:
+      tags: 
+        - password-credentials
+      summary: Changes the password for the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/changePasswordDto'
+      responses:
+        '204':
+          description: Password was changed successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13053</td>
+                <td>The password is empty.</td>
+              </tr>
+              <tr>
+                <td>13200</td>
+                <td>Password complexity rules are not met.</td>
+              </tr>
+              <tr>
+                <td>13520</td>
+                <td>Invalid current password.</td>
+              </tr>
+              <tr>
+                <td>13530</td>
+                <td>Current and new password are the same.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13400</td>
+                <td>The password could not be found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+                
+  /password-credentials/validate:
+    post:
+      tags: 
+        - password-credentials
+      summary: Validate the password for the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/validatePasswordDto'
+      responses:
+        '200':
+          description: Password validation has been performed.
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13400</td>
+                <td>The password could not be found.</td>
+              </tr>
+            </table>
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+
+  /certificates/:
+    get:
+      tags: 
+        - certificates
+      summary: Gets certificates.
+      description: Gets certificates.
+      responses:
+        '200':
+          description: Certificates were retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of certificates.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/certificate'
+                  itemCount:
+                    type: integer
+                    example: 3
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  
+  /certificates/{certificateId}/update:
+    post:
+      tags: 
+        - certificates
+      summary: Updates the certificate.
+      description: Updates the certificate.
+      parameters: 
+        - name: certificateId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: certificate id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/certificateModifiable'
+
+      responses:
+        '204':
+          description: The certificate has been updated successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13056</td>
+                <td>The certificate is empty.</td>
+              </tr>
+              <tr>
+                <td>13550</td>
+                <td>The certificate cannot be parsed.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+                
+  /certificates/details:
+    get:
+      tags: 
+        - certificates
+      summary: Gets the certificate details.
+      description: Gets the certificate details.
+      parameters: 
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: user id.
+        - name: thumbprint
+          in: query
+          required: true
+          schema:
+            type: string
+          description: thumbprint.
+
+      responses:
+        '200':
+          description: Certificate details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/certificateDto'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13560</td>
+                <td>The certificate is not found.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+
+  /user-accepted-terms/{id}:
+    get:
+      tags: 
+        - user-accepted-terms
+      summary: Gets user accepted terms.
+      description: Gets user accepted terms.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The id of user's accepted term.
+      responses:
+        '200':
+          description: User accepted terms were retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of user accepted terms.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userAcceptedTerm'
+                  itemCount:
+                    type: integer
+                    example: 1
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  /user-accepted-terms/:
+    put:
+      tags: 
+        - user-accepted-terms
+      summary: Create or update user accepted terms.
+      description: >-
+        Creates or updates user accepted term if there is already one with the same term type and user id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userAcceptedTermModifiable'
+      responses:
+        '200':
+          description: User accepted terms were updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of user accepted terms.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userAcceptedTerm'
+                  itemCount:
+                    type: integer
+                    example: 1
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>13004</td>
+                <td>The accepted terms identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>13005</td>
+                <td>The accepted terms type is less than zero.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+  /statistics/collect:
+    get:
+      tags:
+      - statistics
+      summary: Gets user statistics.
+      description: Gets users count per organization statistics.
+      responses:
+        '200':
+          description: User accepted terms were updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/statisticsDto'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                errorCode: 12345
+                errorMessage: Some server error.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas: 
+    validationError:
+      type: object
+      description: Validation error.
+      properties:
+        validationErrorCode:
+          type: integer
+          description: Validation error code.
+          example: 13100
+        propertyName:
+          type: string
+          description: Property name.
+          example: userName.
+      
+    error:
+      type: object
+      description: Error details.
+      properties:
+        errorCode:
+          type: integer
+          description: Internal code of an error.
+        errorMessage:
+          type: string
+          description: Error message.
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/validationError'
+        isTemporary:
+          type: boolean
+          description: Indicates whether an error is temporary.
+
+    idResponse:
+      type: object
+      description: Response model contains resource identifier.
+      properties:
+        id: 
+          type: integer
+          format: int64
+          example: 1
+
+    user:
+      allOf:
+        - $ref: '#/components/schemas/userModifiableProperties'
+      type: object
+      description: User information.
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        dateOfBirth:
+          type: string
+          format: date
+          description: User's date of birth.
+          example: "2000-03-20"
+        organizationId:
+          type: integer
+          format: int64
+          example: 2
+        userType:
+          type: string
+          enum:
+            - Citizen
+            - OrganizationMember
+            - SolutionAdmin
+            - M2M
+          example: Citizen
+        internalReferenceNumber:
+          type: string
+          example: abcdefg123
+
+    userModifiableProperties:
+      type: object
+      description: User model conains properties which are allowed to be modified.
+      properties:
+        name: 
+          type: string
+          example: John Smith
+        languageId: 
+          type: integer
+          format: int64
+          example: 2
+        countryId: 
+          type: integer
+          format: int64
+          example: 2
+          
+    createUser:
+      allOf:
+        - $ref: '#/components/schemas/user'
+        - type: object
+          description: Model for creating a user with password credentials.
+          properties:
+            password:
+              type: string
+              example: Str0ngPassword
+            activationStatus:
+              type: boolean
+              example: true
+            isOneTimePassword:
+              type: boolean
+              example: true
+            email:
+              type: string
+              format: email
+              example: test@e-boks.dk
+            certificateBase64:
+              type: string
+              description: Must be valid base64 encoded certificate. Now only for M2M
+            userAcceptedTerms:
+              type: array
+              items:
+                $ref: '#/components/schemas/userAcceptedTermsDto'
+            identities:
+              type: array
+              items:
+                type: object
+                properties:
+                  identity:
+                    type: string
+                    example: jsmith
+                  countryCode:
+                    type: string
+                    example: BHR
+                  identityTypeId:
+                    type: integer
+                    format: int32
+                    example: 1
+                  verifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        data:
+                          type: string
+                          example: "verification-value"
+                        verificationTypeId:
+                          type: integer
+                          format: int32
+                          example: 1
+                
+    createInterimUser:
+      type: object
+      description: Model for creating an interim user.
+      properties:
+        userName:
+          type: string
+          example: jsmith
+        identityTypeId:
+          type: integer
+          format: int32
+          example: 1
+        dateOfBirth:
+          type: string
+          format: date
+          example: "2000-03-20"
+          
+    activateInterimUser:
+      type: object
+      description: Model for activating an interim user.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User identifier.
+          example: 1
+        name:
+          type: string
+          example: jsmith
+        originalIdentity:
+          type: string
+          example: 4819L123
+        originalIdentityTypeId:
+          type: integer
+          format: int32
+          example: 1
+        password:
+          type: string
+          example: Str0ngPassword
+        languageId:
+          type: integer
+          format: int32
+          example: 1
+        countryId:
+          type: integer
+          format: int32
+          example: 1
+        dateOfBirth:
+          type: string
+          format: date
+          example: "2000-03-20"
+        userAcceptedTerms:
+          type: array
+          items:
+            $ref: '#/components/schemas/userAcceptedTermsDto'
+    
+    deliverInterimMessagesDto:
+      type: object
+      description: Model for deliver interim messages to user
+      properties:
+        accept:
+          type: boolean
+          example: true
+        userId:
+          type: integer
+          format: int64
+          description: User id.
+          example: 1234
+
+    userStatus:
+      allOf:
+        - $ref: '#/components/schemas/userStatusModifiable'
+        - type: object
+          description: User status
+          properties:
+            id:
+              type: integer
+              format: int64
+              description: User status identifier.
+              example: 1
+            activationDate:
+              type: string
+              format: date-time
+              description: Specifies when user was activated.
+              example: "2018-12-15T13:14:22.4091760Z"
+            deactivationDate:
+              type: string
+              format: date-time
+              description: Specifies when user was deactivated.
+              example: "2018-12-15T13:14:22.4091760Z"
+            userDeleteJobIdentifier:
+              type: string
+              format: guid
+              description: The user delete job identifier.
+              example: "067ed9b4-29d7-45ee-bc02-c693022b98d3"
+
+    userStatusModifiable:
+      type: object
+      description: User status
+      properties:
+        active:
+          type: boolean
+          example: false
+        deactivationReason:
+          type: string
+          enum:
+            - None
+            - Deceased
+            - EmploymentTerminated
+            - Locked
+            - RequestedByCitizen
+          example: EmploymentTerminated  
+
+    activatePasswordDto:
+      type: object
+      description: Dto for activate one time password
+      required: 
+      - userId
+      - organizationId
+      - currentPassword
+      - newPassword
+      - activationCode
+      properties:
+        userId:
+          type: integer
+          example: 1
+        organizationId:
+          type: integer
+          format: int64
+          example: 1
+        currentPassword:
+          type: string
+          example: 12345678
+        newPassword:
+          type: string
+          example: Str0ngPassword
+        activationCode:
+          type: string
+          format: uuid
+          example: "3d6c0df4-9d28-461f-9d2f-f166cfcf8ba4"
+    resetPasswordDto:
+      type: object
+      description: Dto for activate one time password
+      required: 
+      - userId
+      - newPassword
+      properties:
+        userId:
+          type: integer
+          example: 1
+        newPassword:
+          type: string
+          example: Str0ngPassword
+
+    changePasswordDto:
+      type: object
+      description: Dto for activate one time password
+      required: 
+      - currentPassword
+      - newPassword
+      properties:
+        currentPassword:
+          type: string
+          example: Str0ngPassword
+        newPassword:
+          type: string
+          example: Str0ngPasswordNew
+          
+    validatePasswordDto:
+      type: object
+      description: Dto for password validation
+      required: 
+      - userId
+      - password
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        password:
+          type: string
+          example: passwordToValidate
+    
+    certificate:
+      allOf:
+        - $ref: '#/components/schemas/certificateModifiable'
+        - type: object
+          description: Certificate
+          properties:
+            id:
+              type: integer
+              format: int64
+              example: 1
+            userId:
+              type: integer
+              format: int64
+              example: 1
+            commonName:
+              type: string
+              example: certificate friendly name
+            serialNumber:
+              type: string
+              example: SNR123
+            thumbprint:
+              type: string
+              example: "0B1C775072023EECBFE13957251661F1D52A1581"
+            expires:
+              type: string
+              format: date-time
+              description: Specifies when user accepted terms and conditions.
+              example: "2018-12-15T13:14:22.4091760Z"
+    certificateModifiable:
+      type: object
+      description: Certificate data
+      properties:
+        data:
+          type: string
+          format: byte
+          description: Must be valid certificate in base64 encoding.
+          example: Prepare data in base64
+    certificateDto:
+      type: object
+      description: Certificate dto
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        thumbprint:
+          type: string
+          example: "0B1C775072023EECBFE13957251661F1D52A1581"
+        data:
+          type: string
+          format: byte
+          description: Must be valid certificate in base64 encoding.
+          example: Prepare data in base64
+        isUserActive:
+          type: boolean
+          example: true
+    userAcceptedTermModifiable:
+      type: object
+      description: User accepted term
+      required:
+      - userId
+      - termId
+      - termType
+      properties:
+        userId:
+          type: integer
+          format: int64
+          description: The id of the user
+          example: 1
+        termId:
+          type: integer
+          format: int64
+          description: The id of the accepted term
+          example: 1
+        termType:
+          type: integer
+          format: int64
+          description: The type of the accepted term in integer format
+          example: 1
+    userAcceptedTerm:
+      allOf:
+        - $ref: '#/components/schemas/userAcceptedTermModifiable'
+        - type: object
+      description: User accepted term
+      required:
+      - userId
+      - termId
+      - termType
+      - acceptedDate
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The id of the accepted term
+          example: 1
+        acceptedDate:
+          type: string
+          format: date-time
+          description: The date when user accepted term
+          example: "2018-12-15T13:14:22.4091760Z"
+    userAcceptedTermsDto:
+      type: object
+      description: Dto for accepted user terms
+      required: 
+      - termId
+      - termType
+      properties:
+        termId:
+          type: integer
+          format: int64
+          description: The id of accepted term
+          example: 1
+        termType:
+          type: integer
+          format: int64
+          description: The type of accepted term in integer format
+          example: 1
+    usersCountDto:
+      type: object
+      description: Dto with users counts per user type for organization.
+      required:
+      - citizenCount
+      - employeeCount
+      - adminCount
+      - systemCount
+      properties:
+        citizenCount:
+          type: integer
+          description: Citizens count in organization.
+          example: 258
+        employeeCount:
+          type: integer
+          description: Employees count in organization.
+          example: 32
+        adminCount:
+          type: integer
+          description: Solution admins count in organization.
+          example: 1
+        systemCount:
+          type: integer
+          description: System users count in organization.
+          example: 13
+    organizationStatisticsDto:
+      type: object
+      description: Dto with users statistics per organization.
+      required:
+      - organizationId
+      - value
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+          description: Organization id.
+          example: 1
+        value:
+          $ref: '#/components/schemas/usersCountDto'
+    statisticsDto:
+      type: object
+      description: The statistics dto
+      required:
+      - statisticsDataPerOrg
+      properties:
+        statisticsDataPerOrg:
+          type: array
+          items:
+            $ref: '#/components/schemas/organizationStatisticsDto'
+    searchForUsersDto:
+      type: object
+      required:
+      - organizationId
+      - doRecursiveSearch
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+          example: 1
+        doRecursiveSearch:
+          type: boolean
+          example: true
+        usersToSearchFor:
+          type: array
+          items:
+            $ref: '#/components/schemas/userSearchDto'
+    userSearchDto:
+      type: object
+      required:
+      - identity
+      - identityTypeId
+      properties:
+        identity:
+          type: string
+          example: "TestUserName"
+        countryCode:
+          type: string
+          example: "BHR"
+        identityTypeId:
+          type: integer
+          example: 1
+        additionalVerifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalVerificationDto'
+    additionalVerificationDto:
+      type: object
+      required:
+      - userVerificationData
+      - userVerificationDataTypeId
+      properties:
+        data:
+          type: string
+          example: "test@test.dk"
+        verificationTypeId:
+          type: integer
+          enum:
+            - 1 # email
+            - 2 # mobile
+            - 3 # dateOfBirth
+          example: 1
+    searchUserResponseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        userIdentity:
+          type: string
+          example: "TestUserName"
+        userIdentityCountryCode:
+          type: string
+          example: "BHR"
+        userIdentityTypeId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Test user"
+        dateOfBirth: 
+          type: string
+          format: date
+          example: "2000-03-20"
+        active:
+          type: boolean
+          example: true
+        deactivationReason:
+          type: string
+          enum:
+            - None
+            - Deceased
+            - EmploymentTerminated
+            - Locked
+          example: None
+        activationDate:
+          type: string
+          format: date-time
+          example: "2018-12-15T13:14:22.4091760Z"
+        deactivationDate:
+          type: string
+          format: date-time
+          example: "2018-12-15T13:14:22.4091760Z"

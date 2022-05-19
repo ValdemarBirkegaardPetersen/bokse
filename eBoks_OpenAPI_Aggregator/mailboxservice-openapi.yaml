@@ -1,0 +1,1422 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/e-Boks/MailboxService/2.0.0
+info:
+  version: "2.1.2"
+  title: Mailbox Service
+  description: The mailbox service defines mailboxes available in the system.
+tags: 
+  - name: mailbox
+  - name: user-roles
+  - name: folder
+security: 
+  - BearerAuth: []
+paths:
+  /mailboxes:
+    post:
+      tags: 
+        - mailbox
+      summary: Creates a mailbox.
+      description: Creates a mailbox.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mailbox'
+            example: 
+              name: "main mailbox"
+              public: false
+              default: false
+              organizationId: 456,
+              type: "UserMailbox"
+              
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resourceIdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20507</td>
+                <td>The organization mailbox name is empty.</td>
+              </tr>
+              <tr>
+                <td>20508</td>
+                <td>The mailbox name length is incorrect.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags: 
+        - mailbox
+      summary: Gets a mailboxes.
+      description: Gets a mailboxes.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of Mailboxes.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/mailbox'
+                  itemCount:
+                    type: integer
+                    example: 2
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /mailboxes/{mailboxId}:
+    get:
+      tags: 
+        - mailbox
+      summary: Gets a mailbox.
+      description: Gets a mailbox with inbox mailbox identifier.
+      parameters: 
+        - name: mailboxId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Mailbox Id.
+      responses:
+        '200':
+          description: Mailbox was retreived successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mailbox'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags: 
+        - mailbox
+      summary: Delete mailbox.
+      description: Delete mailbox.
+      parameters: 
+        - name: mailboxId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Mailbox Id.
+      responses:
+        '204':
+          description: Deleted successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>1001</td>
+                <td>Entity not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /mailboxes/{mailboxId}/update:
+    post:
+      tags: 
+        - mailbox
+      summary: Update mailbox.
+      description: Update mailbox.
+      parameters: 
+        - name: mailboxId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Mailbox Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mailboxModifiableProperties'
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20507</td>
+                <td>The mailbox name is empty.</td>
+              </tr>
+              <tr>
+                <td>20508</td>
+                <td>The mailbox name length is incorrect.</td>
+              </tr>
+              <tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /user-roles:
+    post:
+      tags: 
+        - user-roles
+      summary: Creates a user role.
+      description: Creates a user role.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userRole'
+            example: 
+              mailboxId: 2,
+              userId: 1,
+              role: "OrganizationMailboxAdmin"
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resourceIdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20000</td>
+                <td>The user identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>20001</td>
+                <td>The mailbox identifier is zero or less.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags: 
+        - user-roles
+      summary: Gets user roles in mailboxes.
+      description: Gets user roles in mailboxes.
+      parameters:
+      - name: userId
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of subscriptions.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/userRole'
+                  itemCount:
+                    type: integer
+                    example: 2
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /user-roles/{userRoleId}:
+    get:
+      tags: 
+        - user-roles
+      summary: Gets a user role.
+      description: Gets a user role by identifier.
+      parameters: 
+        - name: userRoleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User role Id.
+      responses:
+        '200':
+          description: User role was retreived successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userRole'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags: 
+        - user-roles
+      summary: Delete user role.
+      description: Delete user role.
+      parameters: 
+        - name: userRoleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User role Id.
+      responses:
+        '204':
+          description: Deleted successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>1001</td>
+                <td>Entity not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+          
+  /user-roles/{userRoleId}/update:
+    post:
+      tags: 
+        - user-roles
+      summary: Update user role.
+      description: Update user role.
+      parameters: 
+        - name: userRoleId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: User role Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/userRoleModifiableProperties'
+            example:
+              role: Admin
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            Bad request
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      
+  /folders:
+    post:
+      tags: 
+        - folder
+      summary: Creates a folder.
+      description: Creates a folder in a mailbox.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/folder'
+            example:
+              parentId: 456
+              name: new sub folder
+              mailboxId: 22
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/resourceIdResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20001</td>
+                <td>The mailbox identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>20002</td>
+                <td>The parent folder identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>20050</td>
+                <td>The folder name is empty.</td>
+              </tr>
+              <tr>
+                <td>20100</td>
+                <td>The folder name length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>20402</td>
+                <td>Parent folder was not found.</td>
+              </tr>
+              <tr>
+                <td>20502</td>
+                <td>The folder subfolders are not allowed.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags: 
+        - folder
+      summary: Get all folders.
+      description: Get folders.
+      parameters:
+      - name: mailboxId
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          example: 2
+        description:  Id of the mailbox.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of subscriptions.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/folder'
+                  itemCount:
+                    type: integer
+                    example: 5
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+                
+  /folders/{folderId}:
+    delete:
+      tags: 
+        - folder
+      summary: Delete folder.
+      description: Delete folder.
+      parameters: 
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Folder Id
+        - name: trashed
+          in: query
+          required: true
+          schema:
+            type: boolean
+          description: Indicates whether messages in folder shoul be moved to deleted folder.
+      responses:
+        '204':
+          description: Deleted successfully.
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20505</td>
+                <td>The folder delete is not allowed.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>1001</td>
+                <td>Entity not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /folders/{folderId}/update:
+    post:
+      tags: 
+        - folder
+      summary: Update folder.
+      description: Update folder.
+      parameters: 
+        - name: folderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Folder Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/folderModifiableProperties'
+            example:
+              name: new folder name
+              parentId: 5
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20002</td>
+                <td>The parent folder identifier is zero or less.</td>
+              </tr>
+              <tr>
+                <td>20050</td>
+                <td>The folder name is empty.</td>
+              </tr>
+              <tr>
+                <td>20100</td>
+                <td>The folder name length is incorrect.</td>
+              </tr>
+              <tr>
+                <td>20402</td>
+                <td>Parent folder was not found.</td>
+              </tr>
+              <tr>
+                <td>20501</td>
+                <td>The folder cannot be moved to itself or its sub-folder.</td>
+              </tr>
+              <tr>
+                <td>20502</td>
+                <td>The folder subfolders are not allowed.</td>
+              </tr>
+              <tr>
+                <td>20503</td>
+                <td>The folder rename is not allowed.</td>
+              </tr>
+              <tr>
+                <td>20504</td>
+                <td>The folder move is not allowed.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+          
+  /delegated-accesses:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Creates a delegated access.
+      description: Creates a delegated access if no one exists or it's inactive already.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createDelegatedAccess'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/createDelegatedAccessResponse'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20607</td>
+                <td>Invalid accessor internal reference number.</td>
+              </tr>
+              <tr>
+                <td>20603</td>
+                <td>The mailbox owner name is required for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20604</td>
+                <td>The mailbox owner name is too long for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20605</td>
+                <td>The accessor name is required for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20606</td>
+                <td>The accessor name is too long for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20608</td>
+                <td>Invalid delegated access role.</td>
+              </tr>
+              <tr>
+                <td>20610</td>
+                <td>Delegated access expiry date cannot be in the past.</td>
+              </tr>
+              <tr>
+                <td>20611</td>
+                <td>Delegated access already exist.</td>
+              </tr>
+              <tr>
+                <td>20612</td>
+                <td> User was not found by internal reference number.</td>
+              </tr>
+              <tr>
+                <td>20617</td>
+                <td>Cannot create delegated access to mailbox owner.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags: 
+        - delegated-accesses
+      summary: Gets a delegated accesses.
+      description: Gets a delegated accesses.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of delegated accesses.
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/delegatedAccesses'
+                  itemCount:
+                    type: integer
+                    example: 2
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /delegated-accesses/{delegatedAccessId}:
+    get:
+      tags: 
+        - delegated-accesses
+      summary: Gets a delegated access.
+      description: Gets a delegated access.
+      parameters: 
+        - name: delegatedAccessId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: delegated access Id.
+      responses:
+        '200':
+          description: Delegated access was retreived successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delegatedAccesses'
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags: 
+        - delegated-accesses
+      summary: Delete delegated access.
+      description: Delete delegated access.
+      parameters: 
+        - name: delegatedAccessId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated access Id.
+      responses:
+        '204':
+          description: Deleted successfully.
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20613</td>
+                <td>The delegated access is not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /delegated-accesses/{delegatedAccessId}/update:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Update delegated accesses.
+      description: Update mailbox.
+      parameters: 
+        - name: delegatedAccessId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated accesses Id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/delegatedAccessModifiableProperties'
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20603</td>
+                <td>The mailbox owner name is required for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20604</td>
+                <td>The mailbox owner name is too long for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20605</td>
+                <td>The accessor name is required for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20606</td>
+                <td>The accessor name is too long for delegated access.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Not found.
+        '500':
+          $ref: '#/components/responses/internalServerError'
+          
+  /delegated-accesses/{delegatedAccessId}/accept:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Accept delegated accesses.
+      description: Accept the mailbox delegated access.
+      parameters: 
+        - name: delegatedAccessId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated access Id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/acceptDelegatedAccess'
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20609</td>
+                <td>Invalid delegated access pin.</td>
+              </tr>
+              <tr>
+                <td>20604</td>
+                <td>The mailbox owner name is too long for delegated access.</td>
+              </tr>
+              <tr>
+                <td>20614</td>
+                <td>Cannot accept delegated access.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20613</td>
+                <td>The delegated access is not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+          
+  /delegated-accesses/{delegatedAccessId}/reject:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Accept delegated accesses.
+      description: Accept the mailbox delegated access.
+      parameters: 
+        - name: delegatedAccessId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated access Id.
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20615</td>
+                <td>Cannot reject delegated access.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20613</td>
+                <td>The delegated access is not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+
+  
+  /delegated-accesses/{id}/cancel:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Cancel delegated access.
+      description: Cancel delegated access.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated access Id.
+      responses:
+        '204':
+          description: No content
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20616</td>
+                <td>Cannot cancel delegated access.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20613</td>
+                <td>The delegated access is not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+
+  /delegated-accesses/{id}/pin:
+    post:
+      tags: 
+        - delegated-accesses
+      summary: Regenerate delegated access PIN.
+      description: Regenerate delegated access PIN.
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Delegated access Id.
+      responses:
+        '200':
+          description: PIN regenerated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/delegatedAccessPin'
+        '400':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20618</td>
+                <td>Cannot regenerate delegated access PIN.</td>
+              </tr>
+            </table>
+        '401':
+          description: Unauthorized.
+        '403':
+          description: Forbidden.
+        '404':
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Custom Error Code</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>20613</td>
+                <td>The delegated access is not found.</td>
+              </tr>
+            </table>
+        '500':
+          $ref: '#/components/responses/internalServerError'
+
+components:
+  schemas:
+    validationError:
+      type: object
+      description: Validation error.
+      properties:
+        validationErrorCode:
+          type: integer
+          description: Validation error code.
+          example: 20100
+        propertyName:
+          type: string
+          description: Property name.
+          example: FolderName.
+    error:
+      type: object
+      description: Error details.
+      properties:
+        errorCode:
+          type: integer
+          description: Internal code of an error.
+          example: 10
+        errorMessage:
+          type: string
+          description: Error message.
+          example: Failed to create a mailbox.
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/validationError'
+        isTemporary:
+          type: boolean
+          description: Indicates whether an error is temporary.
+          example: false
+    
+    resourceIdResponse:
+      type: object
+      description: Response for create/update.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Resource identifier.
+          example: 1
+    
+    mailboxModifiableProperties:
+      type: object
+      description: Mailbox.
+      properties:
+        name:
+          type: string
+          example: Main
+        public:
+          type: boolean
+          example: true
+        default: 
+          type: boolean
+          example: false
+          
+    mailbox:
+      type: object
+      description: Mailbox
+      allOf:
+        - $ref: '#/components/schemas/mailboxModifiableProperties'
+      required:
+        - organizationId
+        - type
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+        organizationId:
+          type: integer
+          format: int64
+          example: 456
+        type:
+          type: string
+          enum: [ UserMailbox, OrganizationMailbox ]
+          
+    userRoleModifiableProperties:
+      type: object
+      description: Mailbox user role.
+      properties:
+        role:
+          type: string
+          enum: [ Owner,Admin,Readonly,OrganizationMailboxAdmin ]
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>Admin</td>
+                <td>User is an admin of a mailbox</td>
+              </tr>
+            </table>
+
+    userRole:
+      type: object
+      description: Mailbox user role.
+      required:
+        - mailboxId
+        - userId
+        - role
+      allOf:
+        - $ref: '#/components/schemas/userRoleModifiableProperties'
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        mailboxId:
+          type: integer
+          format: int64
+          example: 34
+        userId:
+          type: integer
+          format: int64
+          example: 12
+    
+    folderModifiableProperties:
+      type: object
+      description: Mailbox folder.
+      properties:
+        name:
+          type: string
+          example: Government
+        parentId:
+          type: integer
+          format: int64
+          example: 456
+    folder:
+      allOf:
+        - $ref: '#/components/schemas/folderModifiableProperties'
+      required:
+        - name
+        - parentId
+        - mailboxId
+      type: object
+      description: User information.
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        mailboxId:
+          type: integer
+          format: int64
+          example: 1
+        isActive:
+          type: boolean
+          example: false
+        folderType:
+          type: string
+          enum: [Root, Inbox, Draft, Sent, Trash, Custom]
+          example: Draft
+          
+    delegatedAccesses:
+      type: object
+      description: Mailbox delegated access.
+      required:
+        - userRoleId
+        - mailboxOwnerUserName
+        - accessorUserName
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        userRoleId:
+          type: integer
+          format: int64
+          example: 34
+        mailboxOwnerUserName:
+          type: string
+          example: "John Doe"
+        accessorUserName:
+          type: string
+          example: "Sara Parker"
+        startDate:
+          type: string
+          format: date-time
+          description: Specifies when user granted the access to mailbox.
+          example: "2020-09-22T13:14:22.4091760Z"
+        endDate:
+          type: string
+          format: date-time
+          description: Specifies when granted access to mailbox expires.
+          example: "2020-11-22T13:14:22.4091760Z"
+        status:
+          type: string
+          enum: [ Pending, Active, Removed, Cancelled, Expired ]
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>Pending</td>
+                <td>Pending status (the access is just creates but not accepted yet)</td>
+              </tr>
+              <tr>
+                <td>Active</td>
+                <td>Active status (the access request was accepted)</td>
+              </tr>
+              <tr>
+                <td>Removed</td>
+                <td>Removed status (the access request was rejected)</td>
+              </tr>
+              <tr>
+                <td>Cancelled</td>
+                <td>Cancelled status (the access request was cancelled by mailbox owner after sending)</td>
+              </tr>
+              <tr>
+                <td>Expired</td>
+                <td>Expired status (the access request was expired)</td>
+              </tr>
+            </table>    
+            
+    delegatedAccessModifiableProperties:
+      type: object
+      description: Delegated access folder.
+      properties:
+        mailboxOwnerUserName:
+          type: string
+          example: John Doe
+        accessorUserName:
+          type: string
+          example: Sara Parker
+    
+    createDelegatedAccess:
+      type: object
+      description: Dto to create delegated access to the mailbox.
+      required:
+        - accessorInternalReferenceNumber
+        - role
+      properties:
+        accessorInternalReferenceNumber:
+          type: string
+          description: The internal reference number of the accessor
+          example: abcd123456
+        expiryDate:
+          type: string
+          format: date-time
+          description: Specifies when granted access to mailbox expires.
+          example: "2020-11-22T13:14:22.4091760Z"
+        role:
+          type: string
+          enum: [ Admin, Readonly ]
+          description: |
+            <table>
+              <thead>
+                <tr>
+                  <th>Value</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tr>
+                <td>Admin = 2</td>
+                <td>The read/write access</td>
+              </tr>
+              <tr>
+                <td>Readonly = 3</td>
+                <td>The read access</td>
+              </tr>
+            </table> 
+
+    createDelegatedAccessResponse:
+      type: object
+      description: Response for create delegated access
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Delegated access identifier.
+          example: 1
+        pin:
+          type: string
+          description: The pin to access the delegated mailbox
+          example: "012345"
+
+    acceptDelegatedAccess:
+      type: object
+      description: Dto to accept the delegated access to the mailbox.
+      required:
+        - userRoleId
+        - pin
+        - mailboxOwnerUserName
+      properties:
+        pin:
+          type: string
+          description: The pin to access the delegated mailbox
+          example: "0123456"
+        mailboxOwnerUserName:
+          type: string
+          description: The mailbox owner user name
+          example: "Sara Parker"
+
+    delegatedAccessPin:
+      type: object
+      description: Delegated access PIN dto
+      properties:
+        pin:
+          type: string
+          description: The new pin to access the delegated mailbox
+          example: "012345"
+
+  responses:
+    internalServerError:
+      description: >-
+        Server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          example:
+            errorCode: 0
+            errorMessage: "Some internal error message"
+            validationErrors: null
+            isTemporary: false
